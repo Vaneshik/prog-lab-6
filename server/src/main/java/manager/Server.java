@@ -134,7 +134,7 @@ public class Server {
                                     dataLength.flip();
 
                                     clientChannel.write(dataLength); // пишем длину ответа клиенту
-                                    logger.info("Длинна ответа (" + dataLength + ") отправлена клиенту");
+                                    logger.info("Длина ответа (" + dataLength + ") отправлена клиенту");
                                     clientChannel.write(clientData); // шлём клиенту ответ
                                     logger.info("Ответ отправлен клиенту");
                                     clientData.clear();

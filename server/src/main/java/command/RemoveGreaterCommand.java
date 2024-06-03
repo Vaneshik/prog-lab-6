@@ -28,7 +28,7 @@ public class RemoveGreaterCommand implements CommandInterface {
             return new Response("Команда не принимает аргументы!", " ");
         }
         var size = manager.getCollection().size();
-        manager.removeGreater(new OrganizationForm().build());
+        manager.removeGreater(organizationObject);
         return new Response("Удалено " + String.valueOf(size - manager.getCollection().size()) + " элементов, превышающих заданный", " ");
     }
 

@@ -29,7 +29,7 @@ public class RemoveLowerCommand implements CommandInterface {
         }
 
         var size = manager.getCollection().size();
-        manager.removeLower(new OrganizationForm().build());
+        manager.removeLower(organizationObject);
         return new Response("Удалено " + String.valueOf(size - manager.getCollection().size()) + " элементов, меньшие, чем заданный", " ");
     }
 

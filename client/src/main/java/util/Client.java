@@ -73,7 +73,7 @@ public class Client {
 
     private void processUserPrompt(String command, String[] arguments) throws IOException, ClassNotFoundException {
         Request request;
-        if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("update")) {
+        if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("update") || command.equalsIgnoreCase("remove_greater") || command.equalsIgnoreCase("add_if_min") || command.equalsIgnoreCase("remove_lower")) {
             Organization objArgument = new OrganizationForm().build();
             request = new Request(command, arguments, objArgument);
             sendAndReceive(request);
