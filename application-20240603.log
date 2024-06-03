@@ -2614,4 +2614,96 @@ null
 2024-06-03 17:18:17.396 [main] INFO  manager.Server - Обработка ключа началась
 2024-06-03 17:18:17.397 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
 2024-06-03 17:18:17.397 [main] INFO  manager.Server - Ответ отправлен клиенту
-2024-06-03 17:18:18.863 [main] INFO  manager.Server - Итератор по ключам селектора у
+2024-06-03 17:18:18.863 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:18.863 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:18.863 [main] INFO  manager.Server - 198 байт пришло от клиента
+2024-06-03 17:18:18.863 [main] INFO  manager.Server - Запрос:
+help
+[Ljava.lang.String;@4044fb95
+null
+Успешно обработан
+2024-06-03 17:18:18.863 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:18.863 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:18.864 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
+2024-06-03 17:18:18.864 [main] INFO  manager.Server - Ответ отправлен клиенту
+2024-06-03 17:18:20.575 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:20.575 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:20.575 [main] INFO  manager.Server - 198 байт пришло от клиента
+2024-06-03 17:18:20.579 [main] INFO  manager.Server - Запрос:
+save
+[Ljava.lang.String;@5c00384f
+null
+Успешно обработан
+2024-06-03 17:18:20.579 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:20.579 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:20.579 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
+2024-06-03 17:18:20.579 [main] INFO  manager.Server - Ответ отправлен клиенту
+2024-06-03 17:18:22.207 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:22.207 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:22.207 [main] INFO  manager.Server - 198 байт пришло от клиента
+2024-06-03 17:18:22.211 [main] INFO  manager.Server - Запрос:
+save
+[Ljava.lang.String;@72758afa
+null
+Успешно обработан
+2024-06-03 17:18:22.211 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:22.211 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:22.211 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
+2024-06-03 17:18:22.212 [main] INFO  manager.Server - Ответ отправлен клиенту
+2024-06-03 17:18:26.731 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:26.731 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:26.731 [main] INFO  manager.Server - 1105 байт пришло от клиента
+2024-06-03 17:18:26.732 [main] INFO  manager.Server - Запрос:
+add
+[Ljava.lang.String;@6eeade6c
+Organization(id=729, name=1, coordinates=Coordinates(x=1.0, y=1.0), creationDate=Mon Jun 03 17:18:23 MSK 2024, annualTurnover=1.0, fullName=1, employeesCount=1, type=GOVERNMENT, postalAddress=Address(zipCode=1, town=Location(x=1, y=1.0, name=1)))
+Успешно обработан
+2024-06-03 17:18:26.732 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:26.732 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:26.732 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
+2024-06-03 17:18:26.732 [main] INFO  manager.Server - Ответ отправлен клиенту
+2024-06-03 17:18:29.692 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:29.693 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:29.693 [main] INFO  manager.Server - 198 байт пришло от клиента
+2024-06-03 17:18:29.693 [main] INFO  manager.Server - Запрос:
+help
+[Ljava.lang.String;@a5bd950
+null
+Успешно обработан
+2024-06-03 17:18:29.693 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:29.693 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:29.693 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
+2024-06-03 17:18:29.693 [main] INFO  manager.Server - Ответ отправлен клиенту
+2024-06-03 17:18:33.295 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:33.295 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:33.295 [main] INFO  manager.Server - 198 байт пришло от клиента
+2024-06-03 17:18:33.295 [main] INFO  manager.Server - Запрос:
+help
+[Ljava.lang.String;@7756c3cd
+null
+Успешно обработан
+2024-06-03 17:18:33.295 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:33.296 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:33.296 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
+2024-06-03 17:18:33.296 [main] INFO  manager.Server - Ответ отправлен клиенту
+2024-06-03 17:18:36.890 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:36.890 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:36.890 [main] INFO  manager.Server - 218 байт пришло от клиента
+2024-06-03 17:18:36.892 [main] INFO  manager.Server - Запрос:
+filter_contains_name
+[Ljava.lang.String;@16746061
+null
+Успешно обработан
+2024-06-03 17:18:36.892 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:36.892 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:36.892 [main] INFO  manager.Server - Длина ответа (java.nio.HeapByteBuffer[pos=4 lim=4 cap=32]) отправлена клиенту
+2024-06-03 17:18:36.892 [main] INFO  manager.Server - Ответ отправлен клиенту
+2024-06-03 17:18:45.516 [main] INFO  manager.Server - Итератор по ключам селектора успешно получен
+2024-06-03 17:18:45.516 [main] INFO  manager.Server - Обработка ключа началась
+2024-06-03 17:18:45.516 [main] INFO  manager.Server - -1 байт пришло от клиента
+2024-06-03 17:18:45.516 [main] INFO  manager.Server - Запрос:
+filter_contains_name
+[Ljava.lang.String;@16746061
+null
+Успешно обработан
+2024-06-03 17:18:45.516 [main] INFO  manager.Server - Клиент java.nio.channels.SocketChannel[connected local=/127.0.0.1:8000 remote=/127.0.0.1:59650] отключился

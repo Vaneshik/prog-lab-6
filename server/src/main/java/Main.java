@@ -9,6 +9,5 @@ public class Main {
 
 //        Server server = new Server(new InetSocketAddress("localhost", 8000));
 //        server.run(new String[]{"data.xml"});
-//        Строчки для теста на локалхосте. Для гелиуса достаточно указать только порт
     }
 }

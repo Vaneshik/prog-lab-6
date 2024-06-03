@@ -45,7 +45,7 @@ public class Server {
             commandManager.addCommand("update", new UpdateCommand(collectionManager));
             commandManager.addCommand("remove_by_id", new RemoveByIdCommand(collectionManager));
             commandManager.addCommand("clear", new ClearCommand(collectionManager));
-            commandManager.addCommand("save", new SaveCommand(fileManager));
+//            commandManager.addCommand("save", new SaveCommand(fileManager));
             commandManager.addCommand("add_if_min", new AddIfMinCommand(collectionManager));
             commandManager.addCommand("remove_greater", new RemoveGreaterCommand(collectionManager));
             commandManager.addCommand("remove_lower", new RemoveLowerCommand(collectionManager));
