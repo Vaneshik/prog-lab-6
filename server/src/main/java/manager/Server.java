@@ -37,7 +37,6 @@ public class Server {
 
     public void run(String[] args) {
 
-        FileManager fileManager = null;
         try {
             commandManager.addCommand("help", new HelpCommand(commandManager));
             commandManager.addCommand("info", new InfoCommand(collectionManager));

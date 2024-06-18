@@ -6,7 +6,6 @@ import models.Organization;
 import models.OrganizationType;
 import network.User;
 
-import java.io.Console;
 import java.sql.*;
 import java.util.Date;
 
@@ -108,9 +107,8 @@ public class DBProvider {
                             new models.Address(res.getString(10), new Location(res.getLong(11), res.getDouble(12), res.getString(13))),
                             res.getString(14)
                     );
-                    if (checkUserExistence(element.getCreator())) {
-                        collectionManager.add(element);
-                    }
+
+                    collectionManager.add(element);
 
                 } catch (IllegalArgumentException e) {
                     Server.logger.error("Повреждённый атрибут type у элемента с id " + res.getLong(1));
@@ -124,27 +122,23 @@ public class DBProvider {
     public static boolean addOrganization(Organization organization) {
 
         String query = "INSERT INTO organizations (name, x, y, creationDate, annualTurnover, fullName, employeesCount, organizationType, addressName, locationX, locationY, locationName, creatorID)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?))";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?))";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, organization.getName());
             p.setDouble(2, organization.getCoordinates().getX());
             p.setFloat(3, organization.getCoordinates().getY());
-
             long dateInMilliseconds = new Date().getTime();
             p.setTimestamp(4, new Timestamp(dateInMilliseconds));
-
             p.setDouble(5, organization.getAnnualTurnover());
             p.setString(6, organization.getFullName());
             p.setInt(7, organization.getEmployeesCount());
-            p.setString(8, organization.getType().getClass().getName());
+            p.setString(8, organization.getType().name());
             p.setString(9, organization.getPostalAddress().getZipCode());
-            p.setString(10, organization.getPostalAddress().getZipCode());
-            p.setLong(11, organization.getPostalAddress().getTown().getX());
-            p.setDouble(12, organization.getPostalAddress().getTown().getY());
-            p.setString(13, organization.getPostalAddress().getTown().getName());
-
-            p.setString(14, organization.getCreator());
+            p.setLong(10, organization.getPostalAddress().getTown().getX());
+            p.setDouble(11, organization.getPostalAddress().getTown().getY());
+            p.setString(12, organization.getPostalAddress().getTown().getName());
+            p.setString(13, organization.getCreator());
 
             p.executeUpdate();
 
@@ -152,6 +146,7 @@ public class DBProvider {
 
         } catch (SQLException e) {
             e.printStackTrace();
+
             return false;
         }
     }
@@ -164,20 +159,17 @@ public class DBProvider {
             p.setString(1, organization.getName());
             p.setDouble(2, organization.getCoordinates().getX());
             p.setFloat(3, organization.getCoordinates().getY());
-
             long dateInMilliseconds = new Date().getTime();
             p.setTimestamp(4, new Timestamp(dateInMilliseconds));
-
             p.setDouble(5, organization.getAnnualTurnover());
             p.setString(6, organization.getFullName());
             p.setInt(7, organization.getEmployeesCount());
-            p.setString(8, organization.getType().getClass().getName());
+            p.setString(8, organization.getType().name());
             p.setString(9, organization.getPostalAddress().getZipCode());
-            p.setString(10, organization.getPostalAddress().getZipCode());
-            p.setLong(11, organization.getPostalAddress().getTown().getX());
-            p.setDouble(12, organization.getPostalAddress().getTown().getY());
-            p.setString(13, organization.getPostalAddress().getTown().getName());
-
+            p.setLong(10, organization.getPostalAddress().getTown().getX());
+            p.setDouble(11, organization.getPostalAddress().getTown().getY());
+            p.setString(12, organization.getPostalAddress().getTown().getName());
+            p.setLong(13, id);
             p.setString(14, organization.getCreator());
 
             p.executeUpdate();
