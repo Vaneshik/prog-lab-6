@@ -93,15 +93,12 @@ public class Server {
                                 forkJoinPool.submit(() -> {
                                     try {
                                         readRequest(clientChannel, key);
-
                                     } catch (SocketException e) {
                                         logger.info("Клиент " + key.channel().toString() + " отключился");
                                         key.cancel();
-
                                     } catch (IOException e) {
                                         logger.error("Ошибка ввода вывода");
                                         e.printStackTrace();
-
                                     } catch (ClassNotFoundException e) {
                                         e.printStackTrace();
                                         logger.error("Class cast ошибка");
@@ -122,7 +119,6 @@ public class Server {
                                 Thread sendThread = new Thread(() -> {
                                     try {
                                         sendResponse(clientChannel);
-
                                     } catch (SocketException e) {
                                         logger.info("Клиент " + key.channel().toString() + " отключился");
                                         key.cancel();
@@ -140,7 +136,7 @@ public class Server {
                         }
                     } catch (SocketException | CancelledKeyException e) {
                         logger.info("Клиент " + key.channel().toString() + " отключился");
-                        fileManager.saveCollection();
+//                        fileManager.saveCollection();
                         key.cancel();
                     } catch (InterruptedException e ) {
                         e.printStackTrace();
@@ -153,7 +149,7 @@ public class Server {
         } catch (NoSuchElementException e) {
             System.out.println(1);
             logger.error("Остановка сервера через консоль");
-            fileManager.saveCollection();
+//            fileManager.saveCollection();
             System.exit(1);
         } catch (IOException e) {
             logger.error("Ошибка ввода/вывода");
@@ -180,7 +176,7 @@ public class Server {
             if (!request.isRegisterRequired()) {
                 if (DBProvider.checkUserExistence(user.getUsername())) {
                     if (DBProvider.checkUserPassword(user)) {
-                        response = new Response("Дарова, " + user.getUsername() + "\n", true);
+                        response = new Response("Привет, " + user.getUsername() + "\n", true);
                         logger.info("Пользователь " + user.getUsername() + " успешно аутентифицирован");
 
                     } else {
@@ -195,10 +191,10 @@ public class Server {
 
             } else {
                 if (DBProvider.checkUserExistence(user.getUsername())){
-                    response = new Response("Такой логин уже занят", false);
+                    response = new Response("Такой пользователь есть в системе(", false);
                 } else {
                     DBProvider.addUser(user);
-                    response = new Response("Добро пожаловать в клуб, " + user.getUsername() + "\n", true);
+                    response = new Response("Добро пожаловать, " + user.getUsername() + "\n", true);
                     logger.info("Пользователь " + user.getUsername() + " успешно зарегистрирован");
                 }
             }
@@ -214,6 +210,7 @@ public class Server {
             } else {
                 response = new Response("Команда не найдена. Используйте help для справки", "");
             }
+
 
             logger.info("Запрос:\n" + commandName + "\n" + commandStrArg + "\n" + commandObjArg + "\nУспешно обработан");
         }

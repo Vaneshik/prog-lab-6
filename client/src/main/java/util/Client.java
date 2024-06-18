@@ -44,17 +44,15 @@ public class Client {
 
             authenticateUser();
 
-
             while (true) {
                 System.out.print("> ");
                 try {
-
                     while (scanner.hasNext()) {
                         var command = "";
                         var arguments = "";
                         String[] input = (scanner.nextLine() + " ").trim().split(" ");
-                        command = input[0].trim();
 
+                        command = input[0].trim();
                         processUserPrompt(command, Arrays.copyOfRange(input, 1, input.length));
                         System.out.print("> ");
                     }
@@ -156,7 +154,7 @@ public class Client {
     private void processUserPrompt(String command, String[] arguments) throws IOException, ClassNotFoundException {
         Request request;
         if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("update") || command.equalsIgnoreCase("remove_greater") || command.equalsIgnoreCase("add_if_min") || command.equalsIgnoreCase("remove_lower")) {
-            Organization objArgument = new OrganizationForm().build();
+            Organization objArgument = new OrganizationForm(user.getUsername()).build();
             request = new Request(user, command, arguments, objArgument);
             sendAndReceive(request);
         } else if (command.equalsIgnoreCase("exit")) {
@@ -172,13 +170,15 @@ public class Client {
             }
         } else {
             request = new Request(user, command, arguments);
-            sendAndReceive(request);
+            Response response = sendAndReceive(request);
+            printResponse(response);
         }
     }
 
     private Response sendAndReceive(Request request) throws IOException, ClassNotFoundException {
-        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-             ObjectOutputStream out = new ObjectOutputStream(bytes)) {
+
+        try(ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(bytes)) {
 
             out.writeObject(request);
             ByteBuffer dataToSend = ByteBuffer.wrap(bytes.toByteArray());
@@ -186,36 +186,28 @@ public class Client {
             out.flush();
         }
 
-        try {
-            ByteBuffer dataToReceiveLength = ByteBuffer.allocate(32);
-            channel.read(dataToReceiveLength); // читаем длину ответа от сервера
-            dataToReceiveLength.flip();
-            int responseLength = dataToReceiveLength.getInt(); // достаём её из буфера
-            ByteBuffer dataToReceive = ByteBuffer.allocate(responseLength * 4); // создаем буфер нужной нам длины
-            channel.read(dataToReceive); // получаем ответ от сервера
+        ByteBuffer dataToReceiveLength = ByteBuffer.allocate(8);
+        channel.read(dataToReceiveLength); // читаем длину ответа от сервера
+        dataToReceiveLength.flip();
+        int responseLength = dataToReceiveLength.getInt(); // достаём её из буфера
 
+        ByteBuffer responseBytes = ByteBuffer.allocate(responseLength); // создаем буфер нужной нам длины
+        ByteBuffer packetFromServer = ByteBuffer.allocate(256);
 
-            ByteBuffer responseBytes = ByteBuffer.allocate(responseLength); // создаем буфер нужной нам длины
-            ByteBuffer packetFromServer = ByteBuffer.allocate(256);
-
-            while (true){
-                channel.read(packetFromServer);
-                if (packetFromServer.position() == 2 && packetFromServer.get(0) == 28 && packetFromServer.get(1) == 28) break;
-                packetFromServer.flip();
-                responseBytes.put(packetFromServer);
-                packetFromServer.clear();
-            }
-
-            try(ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(responseBytes.array()))){
-                return (Response) in.readObject();
-            }
-
-        } catch (Exception e) {
-            System.out.println("Ошибка при получении ответа от сервера");
-            exit(1);
+        while (true){
+            channel.read(packetFromServer);
+            if (packetFromServer.position() == 2 && packetFromServer.get(0) == 28 && packetFromServer.get(1) == 28) break;
+            packetFromServer.flip();
+            responseBytes.put(packetFromServer);
+            packetFromServer.clear();
         }
-        return null;
+
+        try(ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(responseBytes.array()))){
+            return (Response) in.readObject();
+        }
     }
+
+
 
     private void printResponse(Response response) {
         System.out.println(response.getMessage());

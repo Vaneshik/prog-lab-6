@@ -12,8 +12,10 @@ import java.util.Random;
  * Форма для создания объекта класса {@link Organization}.
  */
 public class OrganizationForm extends Form<Organization> {
+    private final String username;
 
-    public OrganizationForm(){
+    public OrganizationForm(String username) {
+        this.username = username;
     }
 
     /**
@@ -33,7 +35,7 @@ public class OrganizationForm extends Form<Organization> {
                 askInteger("количество сотрудников", " (целое число, поле не может быть пустым, значение должно быть больше нуля)", x -> (x != null && x > 0)),
                 askOrganizationType(),
                 askAddress(),
-                askString("создатель", " (строка, поле не может быть пустым)", s -> !s.isEmpty())
+                this.username
         );
     }
 

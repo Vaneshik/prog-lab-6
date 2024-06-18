@@ -28,7 +28,7 @@ public class ClearCommand implements CommandInterface {
            return new Response("Команда не принимает аргументы!", " ");
         }
 
-        manager.clear();
+        manager.clear(user);
         return new Response("Коллекция очищена", " ");
     }
 

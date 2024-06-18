@@ -154,7 +154,7 @@ public class DBProvider {
         }
     }
 
-    public static boolean updateOrganization(User user, long id, Organization organization) {
+    public static boolean updateOrganization(long id, Organization organization) {
 
         String query = "UPDATE vehicles SET name = ?, x = ?, y = ?, creationDate = ?, annualTurnover = ?, fullName = ?, employeesCount = ?, organizationType = ?, addressName = ?, locationX = ?, locationY = ?, locationName = ? WHERE (id = ? AND creatorid IN (SELECT id FROM users WHERE username = ?))";
 
@@ -234,7 +234,7 @@ public class DBProvider {
         }
     }
 
-    public static boolean clearOrganizaitons(User user) {
+    public static boolean clearOrganizations(User user) {
 
         String query = "DELETE FROM organizations WHERE creatorid IN (SELECT id FROM users WHERE username = ?)";
 

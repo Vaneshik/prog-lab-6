@@ -4,10 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import models.Address;
 import models.Organization;
+import network.User;
 
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Класс для управления коллекцией.
@@ -25,13 +27,19 @@ public class CollectionManager {
      */
     private TreeSet<Organization> collection = new TreeSet<Organization>();
 
+    private ReentrantLock locker = new ReentrantLock();
+
     /**
      * Добавить элемент в коллекцию.
      *
      * @param o элемент
      */
     public void add(Organization o) {
-        collection.add(o);
+        locker.lock();
+        if (DBProvider.addOrganization(o)) {
+            collection.add(o);
+        }
+        locker.unlock();
     }
 
     /**
@@ -41,16 +49,20 @@ public class CollectionManager {
      * @param o  новый элемент
      */
     public void update(long id, Organization o) {
-        collection.stream().filter(organization -> organization.getId() == id).forEach(organization -> {
-            organization.setName(o.getName());
-            organization.setCoordinates(o.getCoordinates());
-            organization.setCreationDate(o.getCreationDate());
-            organization.setAnnualTurnover(o.getAnnualTurnover());
-            organization.setFullName(o.getFullName());
-            organization.setEmployeesCount(o.getEmployeesCount());
-            organization.setType(o.getType());
-            organization.setPostalAddress(o.getPostalAddress());
-        });
+        locker.lock();
+        if (DBProvider.updateOrganization(id, o)) {
+            collection.stream().filter(organization -> organization.getId() == id).forEach(organization -> {
+                organization.setName(o.getName());
+                organization.setCoordinates(o.getCoordinates());
+                organization.setCreationDate(o.getCreationDate());
+                organization.setAnnualTurnover(o.getAnnualTurnover());
+                organization.setFullName(o.getFullName());
+                organization.setEmployeesCount(o.getEmployeesCount());
+                organization.setType(o.getType());
+                organization.setPostalAddress(o.getPostalAddress());
+            });
+        }
+        locker.unlock();
     }
 
     /**
@@ -59,13 +71,21 @@ public class CollectionManager {
      * @param id id элемента
      */
     public void removeById(long id) {
-        collection.removeIf(o -> o.getId() == id);
+        locker.lock();
+        if (DBProvider.removeOrganizationById(id)) {
+            collection.removeIf(o -> o.getId() == id);
+        }
+        locker.unlock();
     }
 
     /**
      * Очистить коллекцию.
      */
-    public void clear() {
+    public void clear(User user) {
+        locker.lock();
+        if (DBProvider.clearOrganizations(user)) {
+            collection.clear();
+        }
         initializationTime = new Date();
         collection.clear();
     }
@@ -84,10 +104,14 @@ public class CollectionManager {
      *
      * @param o элемент
      */
-    public void addIfMin(Organization o) {
+    public void addIfMin(User user, Organization o) {
+        locker.lock();
         if (collection.isEmpty() || collection.first().compareTo(o) > 0) {
-            collection.add(o);
+            if (DBProvider.addOrganization(o)) {
+                collection.add(o);
+            }
         }
+        locker.unlock();
     }
 
     /**
@@ -113,6 +137,8 @@ public class CollectionManager {
      *
      * @param o объект для сравнения
      */
+
+    // TODO: removeGreater
     public void removeGreater(Organization o) {
         collection.removeIf(organization -> organization.compareTo(o) > 0);
     }
@@ -122,6 +148,7 @@ public class CollectionManager {
      *
      * @param o объект для сравнения
      */
+    // TODO: removeLower
     public void removeLower(Organization o) {
         collection.removeIf(organization -> organization.compareTo(o) < 0);
     }
