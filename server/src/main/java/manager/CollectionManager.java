@@ -157,7 +157,16 @@ public class CollectionManager {
 
     // TODO: removeGreater
     public void removeGreater(Organization o) {
-        collection.removeIf(organization -> organization.compareTo(o) > 0);
+        locker.writeLock().lock();
+        try {
+            // Remove from database
+            DBProvider.removeOrganizationsGreaterThan(o);
+
+            // Remove from collection
+            collection.removeIf(organization -> organization.compareTo(o) > 0);
+        } finally {
+            locker.writeLock().unlock();
+        }
     }
 
     /**
@@ -167,7 +176,16 @@ public class CollectionManager {
      */
     // TODO: removeLower
     public void removeLower(Organization o) {
-        collection.removeIf(organization -> organization.compareTo(o) < 0);
+        locker.writeLock().lock();
+        try {
+            // Remove from database
+            DBProvider.removeOrganizationsLessThan(o);
+
+            // Remove from collection
+            collection.removeIf(organization -> organization.compareTo(o) < 0);
+        } finally {
+            locker.writeLock().unlock();
+        }
     }
 
     /**

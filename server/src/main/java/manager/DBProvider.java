@@ -244,19 +244,32 @@ public class DBProvider {
         }
     }
 
-//    public static long loadElCount() {
-//        String query = " select last_value from vehicles_id_seq";
-//
-//        try (PreparedStatement p = connection.prepareStatement(query)) {
-//            ResultSet res = p.executeQuery();
-//
-//            if (res.next()) {
-//                return res.getLong(1);
-//            }
-//            return -1;
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return -1;
-//        }
-//    }
+    public static boolean removeOrganizationsGreaterThan(Organization o) {
+        String query = "DELETE FROM organizations WHERE annualTurnover > ? AND creatorID IN (SELECT id FROM users WHERE username = ?)";
+
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setDouble(1, o.getAnnualTurnover());
+            p.setString(2, o.getCreator());
+            int affectedRows = p.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean removeOrganizationsLessThan(Organization o) {
+        String query = "DELETE FROM organizations WHERE annualTurnover < ? AND creatorID IN (SELECT id FROM users WHERE username = ?)";
+
+        try (PreparedStatement p = connection.prepareStatement(query)) {
+            p.setDouble(1, o.getAnnualTurnover());
+            p.setString(2, o.getCreator());
+            int affectedRows = p.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
