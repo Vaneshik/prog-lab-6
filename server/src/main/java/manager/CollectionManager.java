@@ -40,6 +40,7 @@ public class CollectionManager {
         locker.readLock().lock();
         if (flag){
             var id = DBProvider.addOrganization(o);
+            System.out.println("id: " + id);
             o.setId(id);
             collection.add(o);
         } else {
@@ -66,9 +67,9 @@ public class CollectionManager {
                 organization.setEmployeesCount(o.getEmployeesCount());
                 organization.setType(o.getType());
                 organization.setPostalAddress(o.getPostalAddress());
+                System.out.println("Элемент обновлен!");
             });
         } else {
-            locker.readLock().unlock();
             System.out.println("Ошибка обновления элемента((");
         }
         locker.readLock().unlock();
