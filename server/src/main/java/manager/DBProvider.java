@@ -6,6 +6,7 @@ import models.Organization;
 import models.OrganizationType;
 import network.User;
 
+import java.io.Console;
 import java.sql.*;
 import java.util.Date;
 
@@ -146,6 +147,7 @@ public class DBProvider {
             p.setString(14, organization.getCreator());
 
             p.executeUpdate();
+
             return true;
 
         } catch (SQLException e) {

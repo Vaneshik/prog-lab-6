@@ -27,7 +27,11 @@ public class CollectionManager {
      */
     private TreeSet<Organization> collection = new TreeSet<Organization>();
 
-    private ReentrantLock locker = new ReentrantLock();
+    private ReentrantLock locker;
+
+    public CollectionManager() {
+        locker = new ReentrantLock();
+    }
 
     /**
      * Добавить элемент в коллекцию.
@@ -104,7 +108,7 @@ public class CollectionManager {
      *
      * @param o элемент
      */
-    public void addIfMin(User user, Organization o) {
+    public void addIfMin(Organization o) {
         locker.lock();
         if (collection.isEmpty() || collection.first().compareTo(o) > 0) {
             if (DBProvider.addOrganization(o)) {
