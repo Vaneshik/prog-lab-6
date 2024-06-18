@@ -122,7 +122,7 @@ public class DBProvider {
     public static Long addOrganization(Organization organization) {
 
         String query = "INSERT INTO organizations (name, x, y, creationDate, annualTurnover, fullName, employeesCount, organizationType, addressName, locationX, locationY, locationName, creatorID)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?))";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?)) RETURNING id";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, organization.getName());
@@ -143,13 +143,12 @@ public class DBProvider {
             ResultSet rs = p.executeQuery();
             if (rs.next()) {
                 return rs.getLong(1);
-            } else {
-                throw new SQLException("No id returned");
             }
         } catch (SQLException e) {
             e.printStackTrace();
             return -1L;
         }
+        return -1L;
     }
 
     public static boolean updateOrganization(long id, Organization organization) {
@@ -202,7 +201,7 @@ public class DBProvider {
 
     public static boolean removeOrganizationsGreaterThanId(User user, long id) {
 
-        String query = "DELETE FROM organizations WHERE (id > ? AND creatorID IN (SELECT id FROM users WHERE username = ?))";
+        String query = "DELETE FROM organizations WHERE (id > ? AND creatorID = ?)";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setLong(1, id);

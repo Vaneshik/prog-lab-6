@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -38,14 +37,13 @@ public class CollectionManager {
      */
     public void add(Organization o, boolean flag) {
         locker.readLock().lock();
-        if (flag){
+
+        if (flag) {
             var id = DBProvider.addOrganization(o);
-            System.out.println("id: " + id);
             o.setId(id);
-            collection.add(o);
-        } else {
-            collection.add(o);
         }
+        collection.add(o);
+
         locker.readLock().unlock();
     }
 
