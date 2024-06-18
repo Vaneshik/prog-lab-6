@@ -67,6 +67,9 @@ public class CollectionManager {
                 organization.setType(o.getType());
                 organization.setPostalAddress(o.getPostalAddress());
             });
+        } else {
+            locker.readLock().unlock();
+            System.out.println("Ошибка обновления элемента((");
         }
         locker.readLock().unlock();
     }

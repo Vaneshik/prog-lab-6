@@ -173,9 +173,12 @@ public class DBProvider {
             p.setLong(13, id);
             p.setString(14, organization.getCreator());
 
-            p.executeUpdate();
-            return true;
+            int affectedRows = p.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Айди не найден");
+            }
 
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
