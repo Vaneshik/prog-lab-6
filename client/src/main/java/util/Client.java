@@ -5,6 +5,7 @@ import models.Organization;
 import models.forms.OrganizationForm;
 import network.Request;
 import network.Response;
+import network.User;
 
 import java.io.*;
 import java.net.*;
@@ -13,6 +14,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static java.lang.System.exit;
@@ -22,6 +24,7 @@ public class Client {
     private final InetAddress host;
     private final int port;
     private SocketChannel channel;
+    private User user;
 
     public Client(InetAddress host, int port) {
         this.host = host;
@@ -38,6 +41,9 @@ public class Client {
             var scanner = PromptScan.getUserScanner();
 
             System.out.println("Клиентское приложение запущено. Для просмотра доступных команд введите 'help'");
+
+            authenticateUser();
+
 
             while (true) {
                 System.out.print("> ");
@@ -71,11 +77,87 @@ public class Client {
         }
     }
 
+    private void authenticateUser(){
+        var scanner = PromptScan.getUserScanner();
+        var username = "";
+        var password = "";
+
+        try {
+            while (true){
+                System.out.println("Введите логин: ");
+                username = scanner.nextLine();
+
+                System.out.println("Введите пароль: ");
+                password = scanner.nextLine();
+
+                user = new User(username, PasswordHasher.getHash(password));
+
+                var userAuthenticationRequest = new Request(user, false);
+                Response response = sendAndReceive(userAuthenticationRequest);
+
+                if (response.isUserAuthentication()){
+                    printResponse(response);
+                    break;
+                } else {
+                    printResponse(response);
+
+                    if (response.getMessage().equals("Пользователя " + user.getUsername() + " не существует")){
+                        System.out.println("Если вы хотите зарегистрироваться, нажмите 'y'");
+                        var ans = scanner.nextLine().trim();
+
+                        if (ans.equalsIgnoreCase("y")){
+                            while (!registerUser()){
+                                registerUser();
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchElementException e) {
+            System.out.println("Остановка клиента через консоль");
+            System.exit(1);
+        }
+    }
+
+    private boolean registerUser() throws IOException, ClassNotFoundException, NoSuchAlgorithmException {
+        try {
+            var scanner = PromptScan.getUserScanner();
+
+            var username = "";
+            var password = "";
+
+            System.out.println("Введите логин: ");
+            username = scanner.nextLine();
+
+            System.out.println("Введите пароль: ");
+            password = scanner.nextLine();
+
+            user = new User(username, PasswordHasher.getHash(password));
+
+            var userAuthenticationRequest = new Request(user, true);
+            Response response = sendAndReceive(userAuthenticationRequest);
+            printResponse(response);
+            return response.isUserAuthentication();
+
+        } catch (NoSuchElementException e) {
+            System.out.println("Остановка клиента через консоль");
+            System.exit(1);
+            return false;
+        }
+    }
+
     private void processUserPrompt(String command, String[] arguments) throws IOException, ClassNotFoundException {
         Request request;
         if (command.equalsIgnoreCase("add") || command.equalsIgnoreCase("update") || command.equalsIgnoreCase("remove_greater") || command.equalsIgnoreCase("add_if_min") || command.equalsIgnoreCase("remove_lower")) {
             Organization objArgument = new OrganizationForm().build();
-            request = new Request(command, arguments, objArgument);
+            request = new Request(user, command, arguments, objArgument);
             sendAndReceive(request);
         } else if (command.equalsIgnoreCase("exit")) {
             System.out.println("Работа клиентского приложения завершена");
@@ -89,12 +171,12 @@ public class Client {
                 System.out.println("Неверное количество аргументов");
             }
         } else {
-            request = new Request(command, arguments);
+            request = new Request(user, command, arguments);
             sendAndReceive(request);
         }
     }
 
-    private void sendAndReceive(Request request) throws IOException, ClassNotFoundException {
+    private Response sendAndReceive(Request request) throws IOException, ClassNotFoundException {
         try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
              ObjectOutputStream out = new ObjectOutputStream(bytes)) {
 
@@ -112,21 +194,37 @@ public class Client {
             ByteBuffer dataToReceive = ByteBuffer.allocate(responseLength * 4); // создаем буфер нужной нам длины
             channel.read(dataToReceive); // получаем ответ от сервера
 
-            try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(dataToReceive.array()))) {
-                Response response = (Response) in.readObject();
 
-                System.out.println(response.getMessage());
-                String collection = response.getCollectionToStr();
-                if (!collection.isEmpty()) {
-                    System.out.println(collection);
-                }
+            ByteBuffer responseBytes = ByteBuffer.allocate(responseLength); // создаем буфер нужной нам длины
+            ByteBuffer packetFromServer = ByteBuffer.allocate(256);
 
+            while (true){
+                channel.read(packetFromServer);
+                if (packetFromServer.position() == 2 && packetFromServer.get(0) == 28 && packetFromServer.get(1) == 28) break;
+                packetFromServer.flip();
+                responseBytes.put(packetFromServer);
+                packetFromServer.clear();
             }
+
+            try(ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(responseBytes.array()))){
+                return (Response) in.readObject();
+            }
+
         } catch (Exception e) {
             System.out.println("Ошибка при получении ответа от сервера");
             exit(1);
         }
+        return null;
+    }
 
+    private void printResponse(Response response) {
+        System.out.println(response.getMessage());
+        String collection = response.getCollectionToStr();
+        try{
+            if (!collection.isEmpty()){
+                System.out.println(collection);
+            }
+        } catch (NullPointerException ignored){}
     }
 
     private void executeScript(String path) throws ClassNotFoundException {

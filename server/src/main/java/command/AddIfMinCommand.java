@@ -3,6 +3,7 @@ package command;
 import manager.CollectionManager;
 import models.Organization;
 import network.Response;
+import network.User;
 
 /**
  * Команда "add_if_min".
@@ -22,7 +23,7 @@ public class AddIfMinCommand implements CommandInterface {
      * @param organizationObject
      */
     @Override
-    public Response execute(String[] args, Organization organizationObject) {
+    public Response execute(User user, String[] args, Organization organizationObject) {
         if (args.length != 0) {
             return new Response("Команда не принимает аргументы!", " ");
         }

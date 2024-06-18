@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import models.Organization;
 import network.Response;
+import network.User;
 
 import java.util.HashMap;
 
@@ -32,11 +33,11 @@ public class CommandManager {
      * @param args аргументы
      * @return код завершения
      */
-    public Response executeCommand(String name, String[] args, Organization organizationObject) {
+    public Response executeCommand(User user, String name, String[] args, Organization organizationObject) {
         CommandInterface command = commands.get(name);
         if (command != null) {
             try {
-                return command.execute(args, organizationObject);
+                return command.execute(user, args, organizationObject);
             } catch (Exception e) {
                 System.err.println(e.getClass().getName());
             }

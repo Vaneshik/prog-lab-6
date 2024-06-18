@@ -4,6 +4,7 @@ import manager.CollectionManager;
 import models.Organization;
 import models.forms.OrganizationForm;
 import network.Response;
+import network.User;
 
 /**
  * Команда "update".
@@ -23,7 +24,7 @@ public class UpdateCommand implements CommandInterface {
      * @param organizationObject
      */
     @Override
-    public Response execute(String[] args, Organization organizationObject) {
+    public Response execute(User user, String[] args, Organization organizationObject) {
         if (args.length != 1) {
             return new Response("Команда принимает один аргумент!", "");
         }

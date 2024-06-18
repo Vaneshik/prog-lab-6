@@ -3,6 +3,7 @@ package command;
 import manager.CommandManager;
 import models.Organization;
 import network.Response;
+import network.User;
 
 /**
  * Команда "help".
@@ -22,7 +23,7 @@ public class HelpCommand implements CommandInterface {
      * @param organizationObject
      */
     @Override
-    public Response execute(String[] args, Organization organizationObject) {
+    public Response execute(User user, String[] args, Organization organizationObject) {
         if (args.length != 0) {
             System.err.println("Команда не принимает аргументы!");
         }

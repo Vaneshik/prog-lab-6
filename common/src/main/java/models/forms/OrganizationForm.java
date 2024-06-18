@@ -32,7 +32,8 @@ public class OrganizationForm extends Form<Organization> {
                 askString("полное название организации", " (строка, поле не может быть пустым)", s -> !s.isEmpty()),
                 askInteger("количество сотрудников", " (целое число, поле не может быть пустым, значение должно быть больше нуля)", x -> (x != null && x > 0)),
                 askOrganizationType(),
-                askAddress()
+                askAddress(),
+                askString("создатель", " (строка, поле не может быть пустым)", s -> !s.isEmpty())
         );
     }
 

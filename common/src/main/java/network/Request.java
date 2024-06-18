@@ -10,15 +10,25 @@ import java.io.Serializable;
 @ToString
 @Getter
 public class Request implements Serializable {
-    private final String commandName;
-    private final String[] commandStrArg;
-    private final Serializable commandObjArg;
+    private User user;
+    private boolean registerRequired;
+    private String commandName;
+    private String[] commandStrArg;
+    private Serializable commandObjArg;
 
-    public Request(String commandName, String[] commandStrArg) {
-        this(commandName, commandStrArg, null);
+    public Request(User user, String commandName, String[] commandStrArg, Serializable commandObjArg) {
+        this.user = user;
+        this.commandName = commandName;
+        this.commandStrArg = commandStrArg;
+        this.commandObjArg = commandObjArg;
     }
 
-    public Request() {
-        this("", new String[0], null);
+    public Request(User user, String commandName, String[] commandStrArg) {
+        this(user, commandName, commandStrArg, null);
+    }
+
+    public Request(User user, boolean registerRequired) {
+        this.user = user;
+        this.registerRequired = registerRequired;
     }
 }

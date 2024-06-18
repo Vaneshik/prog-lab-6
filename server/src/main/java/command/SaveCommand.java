@@ -2,6 +2,7 @@ package command;
 
 import manager.FileManager;
 import network.Response;
+import network.User;
 
 /**
  * Команда "save".
@@ -20,7 +21,7 @@ public class SaveCommand implements CommandInterface {
      * @param args аргументы
      */
     @Override
-    public Response execute(String[] args, models.Organization organizationObject) {
+    public Response execute(User user, String[] args, models.Organization organizationObject) {
         if (args.length != 0) {
             return new Response("Команда не принимает аргументы!", " ");
         }

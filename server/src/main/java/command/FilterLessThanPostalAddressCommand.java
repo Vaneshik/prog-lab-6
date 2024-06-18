@@ -4,6 +4,7 @@ import manager.CollectionManager;
 import models.Organization;
 import models.forms.AddressForm;
 import network.Response;
+import network.User;
 
 /**
  * Команда "filter_less_than_postal_address".
@@ -23,7 +24,7 @@ public class FilterLessThanPostalAddressCommand implements CommandInterface {
      * @param organizationObject
      */
     @Override
-    public Response execute(String[] args, Organization organizationObject) {
+    public Response execute(User user, String[] args, Organization organizationObject) {
         if (args.length != 0) {
             return new Response("Команда не принимает аргументы!", " ");
         }
