@@ -39,9 +39,12 @@ public class CollectionManager {
     public void add(Organization o, boolean flag) {
         locker.readLock().lock();
         if (flag){
-            DBProvider.addOrganization(o);
+            var id = DBProvider.addOrganization(o);
+            o.setId(id);
+            collection.add(o);
+        } else {
+            collection.add(o);
         }
-        collection.add(o);
         locker.readLock().unlock();
     }
 
@@ -111,7 +114,7 @@ public class CollectionManager {
     public void addIfMin(Organization o) {
         locker.readLock().lock();
         if (collection.isEmpty() || collection.first().compareTo(o) > 0) {
-            if (DBProvider.addOrganization(o)) {
+            if (DBProvider.addOrganization(o) != -1) {
                 collection.add(o);
             }
         }

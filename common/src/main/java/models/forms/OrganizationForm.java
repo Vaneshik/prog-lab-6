@@ -26,7 +26,7 @@ public class OrganizationForm extends Form<Organization> {
     @Override
     public Organization build() {
         return new Organization(
-                new Random().nextInt(1000),
+                -1,
                 askString("название организации", " (строка, поле не может быть пустым)", s -> !s.isEmpty()),
                 askCoordinates(),
                 new Date(),

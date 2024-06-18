@@ -119,7 +119,7 @@ public class DBProvider {
         }
     }
 
-    public static boolean addOrganization(Organization organization) {
+    public static Long addOrganization(Organization organization) {
 
         String query = "INSERT INTO organizations (name, x, y, creationDate, annualTurnover, fullName, employeesCount, organizationType, addressName, locationX, locationY, locationName, creatorID)" +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?))";
@@ -140,14 +140,15 @@ public class DBProvider {
             p.setString(12, organization.getPostalAddress().getTown().getName());
             p.setString(13, organization.getCreator());
 
-            p.executeUpdate();
-
-            return true;
-
+            ResultSet rs = p.executeQuery();
+            if (rs.next()) {
+                return rs.getLong(1);
+            } else {
+                throw new SQLException("No id returned");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-
-            return false;
+            return -1L;
         }
     }
 
