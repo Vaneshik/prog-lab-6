@@ -38,11 +38,12 @@ public class CollectionManager {
      *
      * @param o элемент
      */
-    public void add(Organization o) {
+    public void add(Organization o, boolean flag) {
         locker.lock();
-        if (DBProvider.addOrganization(o)) {
-            collection.add(o);
+        if (flag){
+            DBProvider.addOrganization(o);
         }
+        collection.add(o);
         locker.unlock();
     }
 
@@ -89,9 +90,10 @@ public class CollectionManager {
         locker.lock();
         if (DBProvider.clearOrganizations(user)) {
             collection.clear();
+            DBProvider.load(this);
         }
         initializationTime = new Date();
-        collection.clear();
+        locker.unlock();
     }
 
     /**

@@ -27,7 +27,7 @@ public class AddCommand implements CommandInterface {
             return new Response("Команда не принимает аргументы!", "");
         }
 
-        manager.add(organizationObject);
+        manager.add(organizationObject, true);
         return new Response("Элемент добавлен!", " ");
     }
 

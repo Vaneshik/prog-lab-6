@@ -108,7 +108,7 @@ public class DBProvider {
                             res.getString(14)
                     );
 
-                    collectionManager.add(element);
+                    collectionManager.add(element, false);
 
                 } catch (IllegalArgumentException e) {
                     Server.logger.error("Повреждённый атрибут type у элемента с id " + res.getLong(1));
