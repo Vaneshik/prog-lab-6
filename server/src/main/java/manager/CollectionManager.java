@@ -9,7 +9,9 @@ import network.User;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Класс для управления коллекцией.
@@ -27,11 +29,7 @@ public class CollectionManager {
      */
     private TreeSet<Organization> collection = new TreeSet<Organization>();
 
-    private ReentrantLock locker;
-
-    public CollectionManager() {
-        locker = new ReentrantLock();
-    }
+    private final ReadWriteLock locker = new ReentrantReadWriteLock();
 
     /**
      * Добавить элемент в коллекцию.
@@ -39,12 +37,12 @@ public class CollectionManager {
      * @param o элемент
      */
     public void add(Organization o, boolean flag) {
-        locker.lock();
+        locker.readLock().lock();
         if (flag){
             DBProvider.addOrganization(o);
         }
         collection.add(o);
-        locker.unlock();
+        locker.readLock().unlock();
     }
 
     /**
@@ -54,7 +52,7 @@ public class CollectionManager {
      * @param o  новый элемент
      */
     public void update(long id, Organization o) {
-        locker.lock();
+        locker.readLock().lock();
         if (DBProvider.updateOrganization(id, o)) {
             collection.stream().filter(organization -> organization.getId() == id).forEach(organization -> {
                 organization.setName(o.getName());
@@ -67,7 +65,7 @@ public class CollectionManager {
                 organization.setPostalAddress(o.getPostalAddress());
             });
         }
-        locker.unlock();
+        locker.readLock().unlock();
     }
 
     /**
@@ -76,24 +74,24 @@ public class CollectionManager {
      * @param id id элемента
      */
     public void removeById(long id) {
-        locker.lock();
+        locker.readLock().lock();
         if (DBProvider.removeOrganizationById(id)) {
             collection.removeIf(o -> o.getId() == id);
         }
-        locker.unlock();
+        locker.readLock().unlock();
     }
 
     /**
      * Очистить коллекцию.
      */
     public void clear(User user) {
-        locker.lock();
+        locker.readLock().lock();
         if (DBProvider.clearOrganizations(user)) {
             collection.clear();
             DBProvider.load(this);
         }
         initializationTime = new Date();
-        locker.unlock();
+        locker.readLock().unlock();
     }
 
     /**
@@ -111,13 +109,13 @@ public class CollectionManager {
      * @param o элемент
      */
     public void addIfMin(Organization o) {
-        locker.lock();
+        locker.readLock().lock();
         if (collection.isEmpty() || collection.first().compareTo(o) > 0) {
             if (DBProvider.addOrganization(o)) {
                 collection.add(o);
             }
         }
-        locker.unlock();
+        locker.readLock().unlock();
     }
 
     /**

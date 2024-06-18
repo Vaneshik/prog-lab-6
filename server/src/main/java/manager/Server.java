@@ -15,6 +15,8 @@ import java.nio.channels.*;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 
 public class Server {
@@ -25,18 +27,23 @@ public class Server {
     protected static Logger logger;
     private CollectionManager collectionManager;
     private CommandManager commandManager;
-    private ForkJoinPool forkJoinPool;
+
+    private ExecutorService readThreadPool;
+    private ExecutorService processThreadPool;
+    private ExecutorService sendThreadPool;
+
 
     public Server(InetSocketAddress address) {
         this.address = address;
         logger = LogManager.getLogger(Server.class);
         this.collectionManager = new CollectionManager();
         this.commandManager = new CommandManager();
-        this.forkJoinPool = ForkJoinPool.commonPool();
+        this.readThreadPool = Executors.newCachedThreadPool();
+        this.processThreadPool = Executors.newFixedThreadPool(10);
+        this.sendThreadPool = Executors.newFixedThreadPool(10);
     }
 
     public void run(String[] args) {
-
         try {
             commandManager.addCommand("help", new HelpCommand(commandManager));
             commandManager.addCommand("info", new InfoCommand(collectionManager));
@@ -89,7 +96,7 @@ public class Server {
                                 SocketChannel clientChannel = (SocketChannel) key.channel();
                                 clientChannel.configureBlocking(false);
 
-                                forkJoinPool.submit(() -> {
+                                readThreadPool.submit(() -> {
                                     try {
                                         readRequest(clientChannel, key);
                                     } catch (SocketException e) {
@@ -102,7 +109,7 @@ public class Server {
                                         e.printStackTrace();
                                         logger.error("Class cast ошибка");
                                     }
-                                }).join();
+                                });
 
                                 Thread processRequestThread = new Thread(this::processRequest);
                                 processRequestThread.start();
@@ -115,20 +122,22 @@ public class Server {
                                 SocketChannel clientChannel = (SocketChannel) key.channel();
                                 clientChannel.configureBlocking(false);
 
-                                Thread sendThread = new Thread(() -> {
-                                    try {
-                                        sendResponse(clientChannel);
-                                    } catch (SocketException e) {
-                                        logger.info("Клиент " + key.channel().toString() + " отключился");
-                                        key.cancel();
+                                processThreadPool.submit(() -> {
+                                    processRequest();
 
-                                    } catch (IOException e) {
-                                        logger.error("Ошибка ввода вывода");
-                                        e.printStackTrace();
-                                    }
+                                    sendThreadPool.submit(() -> {
+                                        try {
+                                            sendResponse(clientChannel);
+                                            clientChannel.register(selector, SelectionKey.OP_READ);
+                                        } catch (SocketException e) {
+                                            logger.info("Клиент " + key.channel().toString() + " отключился");
+                                            key.cancel();
+                                        } catch (IOException e) {
+                                            logger.error("Ошибка ввода вывода");
+                                            e.printStackTrace();
+                                        }
+                                    });
                                 });
-                                sendThread.start();
-                                sendThread.join();
 
                                 clientChannel.register(selector, SelectionKey.OP_READ);
                             }
@@ -154,6 +163,10 @@ public class Server {
             logger.error("Ошибка ввода/вывода");
         } catch (Exception e) {
             logger.error("Ошибка сервера: " + e.getMessage());
+        } finally {
+            readThreadPool.shutdown();
+            processThreadPool.shutdown();
+            sendThreadPool.shutdown();
         }
     }
 
