@@ -120,9 +120,8 @@ public class DBProvider {
     }
 
     public static Long addOrganization(Organization organization) {
-
         String query = "INSERT INTO organizations (name, x, y, creationDate, annualTurnover, fullName, employeesCount, organizationType, addressName, locationX, locationY, locationName, creatorID)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?)) RETURNING id";
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?)) RETURNING id";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, organization.getName());
@@ -152,15 +151,13 @@ public class DBProvider {
     }
 
     public static boolean updateOrganization(long id, Organization organization) {
-
-        String query = "UPDATE vehicles SET name = ?, x = ?, y = ?, creationDate = ?, annualTurnover = ?, fullName = ?, employeesCount = ?, organizationType = ?, addressName = ?, locationX = ?, locationY = ?, locationName = ? WHERE (id = ? AND creatorid IN (SELECT id FROM users WHERE username = ?))";
+        String query = "UPDATE organizations SET name = ?, x = ?, y = ?, creationDate = ?, annualTurnover = ?, fullName = ?, employeesCount = ?, organizationType = ?, addressName = ?, locationX = ?, locationY = ?, locationName = ? WHERE (id = ? AND creatorid IN (SELECT id FROM users WHERE username = ?))";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, organization.getName());
             p.setDouble(2, organization.getCoordinates().getX());
             p.setFloat(3, organization.getCoordinates().getY());
-            long dateInMilliseconds = new Date().getTime();
-            p.setTimestamp(4, new Timestamp(dateInMilliseconds));
+            p.setTimestamp(4, new Timestamp(organization.getCreationDate().getTime())); // Use the creationDate from the organization object
             p.setDouble(5, organization.getAnnualTurnover());
             p.setString(6, organization.getFullName());
             p.setInt(7, organization.getEmployeesCount());
@@ -174,7 +171,7 @@ public class DBProvider {
 
             int affectedRows = p.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Айди не найден");
+                throw new SQLException("Айди не найден или пользователь не авторизован для обновления этого элемента");
             }
 
             return true;
@@ -183,6 +180,7 @@ public class DBProvider {
             return false;
         }
     }
+
 
     public static boolean removeOrganizationById(long id) {
 

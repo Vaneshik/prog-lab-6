@@ -36,16 +36,24 @@ public class CollectionManager {
      * @param o элемент
      */
     public void add(Organization o, boolean flag) {
-        locker.readLock().lock();
-
-        if (flag) {
-            var id = DBProvider.addOrganization(o);
-            o.setId(id);
+        locker.writeLock().lock();
+        try {
+            if (flag) {
+                var id = DBProvider.addOrganization(o);
+                if (id != -1) {
+                    o.setId(id);
+                    collection.add(o); // Add to collection only if database insertion is successful
+                } else {
+                    System.out.println("Error adding organization to the database.");
+                }
+            } else {
+                collection.add(o);
+            }
+        } finally {
+            locker.writeLock().unlock();
         }
-        collection.add(o);
-
-        locker.readLock().unlock();
     }
+
 
     /**
      * Обновить элемент коллекции по id.
@@ -54,7 +62,7 @@ public class CollectionManager {
      * @param o  новый элемент
      */
     public void update(long id, Organization o) {
-        locker.readLock().lock();
+        locker.writeLock().lock();
         if (DBProvider.updateOrganization(id, o)) {
             collection.stream().filter(organization -> organization.getId() == id).forEach(organization -> {
                 organization.setName(o.getName());
@@ -70,7 +78,7 @@ public class CollectionManager {
         } else {
             System.out.println("Ошибка обновления элемента((");
         }
-        locker.readLock().unlock();
+        locker.writeLock().unlock();
     }
 
     /**
@@ -79,24 +87,24 @@ public class CollectionManager {
      * @param id id элемента
      */
     public void removeById(long id) {
-        locker.readLock().lock();
+        locker.writeLock().lock();
         if (DBProvider.removeOrganizationById(id)) {
             collection.removeIf(o -> o.getId() == id);
         }
-        locker.readLock().unlock();
+        locker.writeLock().unlock();
     }
 
     /**
      * Очистить коллекцию.
      */
     public void clear(User user) {
-        locker.readLock().lock();
+        locker.writeLock().lock();
         if (DBProvider.clearOrganizations(user)) {
             collection.clear();
             DBProvider.load(this);
         }
         initializationTime = new Date();
-        locker.readLock().unlock();
+        locker.writeLock().unlock();
     }
 
     /**
@@ -114,13 +122,13 @@ public class CollectionManager {
      * @param o элемент
      */
     public void addIfMin(Organization o) {
-        locker.readLock().lock();
+        locker.writeLock().lock();
         if (collection.isEmpty() || collection.first().compareTo(o) > 0) {
             if (DBProvider.addOrganization(o) != -1) {
                 collection.add(o);
             }
         }
-        locker.readLock().unlock();
+        locker.writeLock().unlock();
     }
 
     /**
