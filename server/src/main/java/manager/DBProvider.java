@@ -1,9 +1,6 @@
 package manager;
 
-import models.Coordinates;
-import models.Location;
-import models.Organization;
-import models.OrganizationType;
+import models.*;
 import network.User;
 
 import java.sql.*;
@@ -85,17 +82,15 @@ public class DBProvider {
     }
 
     public static void load(CollectionManager collectionManager) {
-
         String query = "SELECT organizations.id, organizations.name, organizations.x, organizations.y, " +
-                "organizations.creationDate, organizations.annualTurnover, organizations.fullName, organizations.employeesCount, "
-                + "organizations.organizationType, organizations.addressName, organizations.locationX, organizations.locationY, organizations.locationName, organizations.creatorID FROM organizations JOIN users ON users.id = organizations.creatorid";
+                "organizations.creationDate, organizations.annualTurnover, organizations.fullName, organizations.employeesCount, " +
+                "organizations.organizationType, organizations.addressName, organizations.locationX, organizations.locationY, organizations.locationName, organizations.creatorID FROM organizations JOIN users ON users.id = organizations.creatorid";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             ResultSet res = p.executeQuery();
-
             while (res.next()) {
                 try {
-                    var element = new Organization(
+                    Organization element = new Organization(
                             res.getLong(1),
                             res.getString(2),
                             new Coordinates(res.getDouble(3), res.getFloat(4)),
@@ -104,14 +99,12 @@ public class DBProvider {
                             res.getString(7),
                             res.getInt(8),
                             OrganizationType.valueOf(res.getString(9)),
-                            new models.Address(res.getString(10), new Location(res.getLong(11), res.getDouble(12), res.getString(13))),
+                            new Address(res.getString(10), new Location(res.getLong(11), res.getDouble(12), res.getString(13))),
                             res.getString(14)
                     );
-
                     collectionManager.add(element, false);
-
                 } catch (IllegalArgumentException e) {
-                    Server.logger.error("Повреждённый атрибут type у элемента с id " + res.getLong(1));
+                    Server.logger.error("Invalid attribute type for element with id " + res.getLong(1));
                 }
             }
         } catch (SQLException e) {
@@ -120,15 +113,14 @@ public class DBProvider {
     }
 
     public static Long addOrganization(Organization organization) {
-        String query = "INSERT INTO organizations (name, x, y, creationDate, annualTurnover, fullName, employeesCount, organizationType, addressName, locationX, locationY, locationName, creatorID)" +
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?)) RETURNING id";
+        String query = "INSERT INTO organizations (name, x, y, creationDate, annualTurnover, fullName, employeesCount, organizationType, addressName, locationX, locationY, locationName, creatorID) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM users WHERE username = ?)) RETURNING id";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, organization.getName());
             p.setDouble(2, organization.getCoordinates().getX());
             p.setFloat(3, organization.getCoordinates().getY());
-            long dateInMilliseconds = new Date().getTime();
-            p.setTimestamp(4, new Timestamp(dateInMilliseconds));
+            p.setTimestamp(4, new Timestamp(organization.getCreationDate().getTime()));
             p.setDouble(5, organization.getAnnualTurnover());
             p.setString(6, organization.getFullName());
             p.setInt(7, organization.getEmployeesCount());
@@ -151,13 +143,13 @@ public class DBProvider {
     }
 
     public static boolean updateOrganization(long id, Organization organization) {
-        String query = "UPDATE organizations SET name = ?, x = ?, y = ?, creationDate = ?, annualTurnover = ?, fullName = ?, employeesCount = ?, organizationType = ?, addressName = ?, locationX = ?, locationY = ?, locationName = ? WHERE (id = ? AND creatorid IN (SELECT id FROM users WHERE username = ?))";
+        String query = "UPDATE organizations SET name = ?, x = ?, y = ?, creationDate = ?, annualTurnover = ?, fullName = ?, employeesCount = ?, organizationType = ?, addressName = ?, locationX = ?, locationY = ?, locationName = ? WHERE id = ? AND creatorID IN (SELECT id FROM users WHERE username = ?)";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, organization.getName());
             p.setDouble(2, organization.getCoordinates().getX());
             p.setFloat(3, organization.getCoordinates().getY());
-            p.setTimestamp(4, new Timestamp(organization.getCreationDate().getTime())); // Use the creationDate from the organization object
+            p.setTimestamp(4, new Timestamp(organization.getCreationDate().getTime()));
             p.setDouble(5, organization.getAnnualTurnover());
             p.setString(6, organization.getFullName());
             p.setInt(7, organization.getEmployeesCount());
@@ -170,27 +162,20 @@ public class DBProvider {
             p.setString(14, organization.getCreator());
 
             int affectedRows = p.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Айди не найден или пользователь не авторизован для обновления этого элемента");
-            }
-
-            return true;
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-
     public static boolean removeOrganizationById(long id) {
-
         String query = "DELETE FROM organizations WHERE id = ?";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setLong(1, id);
-            p.executeUpdate();
-            return true;
-
+            int affectedRows = p.executeUpdate();
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -230,19 +215,18 @@ public class DBProvider {
     }
 
     public static boolean clearOrganizations(User user) {
-
-        String query = "DELETE FROM organizations WHERE creatorid IN (SELECT id FROM users WHERE username = ?)";
+        String query = "DELETE FROM organizations WHERE creatorID IN (SELECT id FROM users WHERE username = ?)";
 
         try (PreparedStatement p = connection.prepareStatement(query)) {
             p.setString(1, user.getUsername());
-            p.executeUpdate();
-            return true;
-
+            int affectedRows = p.executeUpdate();
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+
 
     public static boolean removeOrganizationsGreaterThan(Organization o) {
         String query = "DELETE FROM organizations WHERE annualTurnover > ? AND creatorID IN (SELECT id FROM users WHERE username = ?)";

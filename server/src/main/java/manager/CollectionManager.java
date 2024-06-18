@@ -40,10 +40,10 @@ public class CollectionManager {
         locker.writeLock().lock();
         try {
             if (flag) {
-                var id = DBProvider.addOrganization(o);
+                Long id = DBProvider.addOrganization(o);
                 if (id != -1) {
                     o.setId(id);
-                    collection.add(o); // Add to collection only if database insertion is successful
+                    collection.add(o);
                 } else {
                     System.out.println("Error adding organization to the database.");
                 }
@@ -64,22 +64,25 @@ public class CollectionManager {
      */
     public void update(long id, Organization o) {
         locker.writeLock().lock();
-        if (DBProvider.updateOrganization(id, o)) {
-            collection.stream().filter(organization -> organization.getId() == id).forEach(organization -> {
-                organization.setName(o.getName());
-                organization.setCoordinates(o.getCoordinates());
-                organization.setCreationDate(o.getCreationDate());
-                organization.setAnnualTurnover(o.getAnnualTurnover());
-                organization.setFullName(o.getFullName());
-                organization.setEmployeesCount(o.getEmployeesCount());
-                organization.setType(o.getType());
-                organization.setPostalAddress(o.getPostalAddress());
-                System.out.println("Элемент обновлен!");
-            });
-        } else {
-            System.out.println("Ошибка обновления элемента((");
+        try {
+            if (DBProvider.updateOrganization(id, o)) {
+                collection.stream().filter(org -> org.getId() == id).forEach(org -> {
+                    org.setName(o.getName());
+                    org.setCoordinates(o.getCoordinates());
+                    org.setCreationDate(o.getCreationDate());
+                    org.setAnnualTurnover(o.getAnnualTurnover());
+                    org.setFullName(o.getFullName());
+                    org.setEmployeesCount(o.getEmployeesCount());
+                    org.setType(o.getType());
+                    org.setPostalAddress(o.getPostalAddress());
+                });
+                System.out.println("Organization updated!");
+            } else {
+                System.out.println("Error updating organization.");
+            }
+        } finally {
+            locker.writeLock().unlock();
         }
-        locker.writeLock().unlock();
     }
 
     /**
@@ -89,10 +92,13 @@ public class CollectionManager {
      */
     public void removeById(long id) {
         locker.writeLock().lock();
-        if (DBProvider.removeOrganizationById(id)) {
-            collection.removeIf(o -> o.getId() == id);
+        try {
+            if (DBProvider.removeOrganizationById(id)) {
+                collection.removeIf(o -> o.getId() == id);
+            }
+        } finally {
+            locker.writeLock().unlock();
         }
-        locker.writeLock().unlock();
     }
 
     /**
@@ -100,12 +106,15 @@ public class CollectionManager {
      */
     public void clear(User user) {
         locker.writeLock().lock();
-        if (DBProvider.clearOrganizations(user)) {
-            collection.clear();
-            DBProvider.load(this);
+        try {
+            if (DBProvider.clearOrganizations(user)) {
+                collection.clear();
+                DBProvider.load(this);
+            }
+            initializationTime = new Date();
+        } finally {
+            locker.writeLock().unlock();
         }
-        initializationTime = new Date();
-        locker.writeLock().unlock();
     }
 
     /**
