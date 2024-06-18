@@ -8,6 +8,7 @@ import network.User;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -163,7 +164,7 @@ public class CollectionManager {
             DBProvider.removeOrganizationsGreaterThan(o);
 
             // Remove from collection
-            collection.removeIf(organization -> organization.compareTo(o) > 0);
+            collection.removeIf(organization -> organization.compareTo(o) > 0 && Objects.equals(organization.getCreator(), o.getCreator()));
         } finally {
             locker.writeLock().unlock();
         }
@@ -182,7 +183,7 @@ public class CollectionManager {
             DBProvider.removeOrganizationsLessThan(o);
 
             // Remove from collection
-            collection.removeIf(organization -> organization.compareTo(o) < 0);
+            collection.removeIf(organization -> organization.compareTo(o) < 0 && Objects.equals(organization.getCreator(), o.getCreator()));
         } finally {
             locker.writeLock().unlock();
         }
